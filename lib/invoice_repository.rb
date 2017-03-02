@@ -51,7 +51,7 @@ class InvoiceRepository
     end
   end
 
-  def find_invoice_items(invoice_id)
+  def find_items(invoice_id)
     parent.find_items_by_invoice_id(invoice_id)
   end
 
@@ -63,6 +63,11 @@ class InvoiceRepository
     parent.find_customer_by_customer_id(customer_id)  
   end
   
+  def check_for_pending(invoice_id)
+    transactions = find_transactions(invoice_id)
+    transactions.any? { |transaction| transaction.result == "pending"}
+  end
+
   def check_for_paid_in_full(invoice_id)
     transactions = find_transactions(invoice_id)
     transactions.any? { |transaction| transaction.result == "success"}
@@ -84,6 +89,10 @@ class InvoiceRepository
     invoices.reduce(0) do |sum, invoice|
       sum += find_invoice_items_total(invoice.id)
     end
+  end
+
+  def find_invoice_items(invoice_id)
+    parent.find_invoice_items_by_invoice_id(invoice_id)
   end
 
   def inspect
